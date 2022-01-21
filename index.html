@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Housie Game</title>
+
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+        }
+
+        .num-sec {
+            width: 60%;
+        }
+
+        .button-sec {
+            width: 40%;
+        }
+
+        table {
+            margin-left: auto;
+            margin-right: auto;
+            border: none;
+            text-align: center;
+            width: 100%;
+        }
+
+        .button-sec table {
+            height: 100%;
+        }
+
+        tr,
+        td {
+            border-collapse: collapse;
+            border: solid 1px #999;
+        }
+
+        td {
+            color: #fff;
+        }
+
+        td.selected {
+            color: #f00;
+        }
+
+        .left,
+        .right {
+            background-color: green;
+            width: 50%;
+            text-align: center;
+            font-size: 30px;
+            font-weight: 500;
+            padding: 5px 0;
+        }
+
+        #number {
+            color: #333;
+        }
+
+        .center {
+            height: 200px;
+            font-size: 100px;
+        }
+
+        button {
+            width: 50%;
+            height: 50%;
+            border: none;
+            background-color: #f6096b;
+            color: #fff;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        font {
+            font-size: 30px;
+        }
+
+        @media only screen and (max-width: 650px) {
+            font {
+                font-size: 20px;
+            }
+
+            button {
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        @media only screen and (max-width: 550px) {
+            .container {
+                flex-wrap: wrap;
+            }
+
+            .button-sec,
+            .num-sec {
+                width: 100%;
+            }
+
+            .center {
+                height: 110px;
+                font-size: 60px;
+            }
+        }
+
+        @media only screen and (max-width: 300px) {
+            font {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h1>HOUSIE BOARD</h1>
+    <div class="container">
+        <div class="num-sec">
+            <table>
+                <tr>
+                    <td class="left">Previous Number</td>
+                    <td class="right">
+                        <div id="prenumber"></div>
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <div id="board"></div>
+            </table>
+        </div>
+        <div class="button-sec">
+            <table>
+                <tr>
+                    <td class="center">
+                        <div id="number"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="">
+                        <button type="button" name="next" value="NEXT NUMBER" onClick="generatenum();">
+                            NEXT NUMBER
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button type="button" name="Reset" value="RESET GAME" onClick="clearn();">
+                            RESET GAME
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+    <script>
+        var array = new Array();
+        var array2 = new Array();
+        var prenum = "";
+        for (i = 1; i <= 90; i++) {
+            array2.push(i);
+        }
+        if (sessionStorage.length != 0) {
+            for (i = 0; i <= 90; i++) {
+                if (sessionStorage.getItem(i) != null) {
+                    array.push(i);
+                    var index = array2.indexOf(i);
+                    array2.splice(index, 1);
+                }
+            }
+            document.getElementById("number").innerHTML = sessionStorage.key(0);
+            document.getElementById("prenumber").innerHTML = sessionStorage.key(1);
+            prenum = sessionStorage.key(1);
+        }
+        function clearn() {
+            sessionStorage.clear();
+            array.splice(0, array.length);
+            array2.splice(0, array2.length);
+            for (i = 1; i <= 90; i++) {
+                array2.push(i);
+            }
+            recreatetable(0);
+            document.getElementById("number").innerHTML = "";
+            document.getElementById("prenumber").innerHTML = "";
+            prenum = "none";
+        }
+
+        function generatenum() {
+            var num = array2[Math.floor(Math.random() * array2.length)];
+            document.getElementById("number").innerHTML = num;
+            document.getElementById("prenumber").innerHTML = prenum;
+            recreatetable(num);
+            prenum = num;
+        }
+
+        function recreatetable(addkey) {
+            var boardhtml = "<table border='1'>";
+            if (addkey != "0") {
+                array.push(addkey);
+                sessionStorage.setItem(addkey, "done");
+                var index = array2.indexOf(addkey);
+                array2.splice(index, 1);
+            }
+            for (i = 1; i <= 90; i++) {
+                if (
+                    i == 1 ||
+                    i == 11 ||
+                    i == 21 ||
+                    i == 31 ||
+                    i == 41 ||
+                    i == 51 ||
+                    i == 61 ||
+                    i == 71 ||
+                    i == 81
+                ) {
+                    boardhtml += "<tr>";
+                }
+                if (array.indexOf(i) > -1) {
+                    boardhtml +=
+                        "<td bgcolor='red' id='td" +
+                        i +
+                        "'><font size=''>" +
+                        i +
+                        "</font></td>";
+                } else {
+                    boardhtml +=
+                        "<td id='td" + i + "'><font size=''>" + i + "</font></td>";
+                }
+                if (
+                    i == 90 ||
+                    i == 80 ||
+                    i == 70 ||
+                    i == 60 ||
+                    i == 50 ||
+                    i == 40 ||
+                    i == 30 ||
+                    i == 20 ||
+                    i == 10
+                ) {
+                    boardhtml += "</tr>";
+                }
+            }
+            boardhtml += "</table>";
+            document.getElementById("board").innerHTML = boardhtml;
+        }
+        recreatetable(0);
+    </script>
+</body>
+
+</html>
